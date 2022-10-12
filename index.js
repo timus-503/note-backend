@@ -20,7 +20,7 @@ app.use("/", homepage);
 app.use("/api/notes", notes);
 
 const PORT = process.env.PORT || 3000;
-const hostName = "192.168.236.243";
+const hostName = "192.168.17.148";
 app.listen(PORT, hostName, () => {
     console.log(`Server Listening ${hostName}:${PORT}`);
 })
