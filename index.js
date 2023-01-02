@@ -3,10 +3,14 @@ const express = require("express");
 const morgan = require("morgan");
 const app = express();
 const mongoose = require("mongoose");
+const dotenv = require('dotenv');
 
-mongoose.connect("mongodb://localhost:27017/notes").then((val) => {
+dotenv.config({ path: `${__dirname}/.env` });
+
+mongoose.connect(process.env.MONGO_URL, { dbName: "notes" }).then((val) => {
     console.log("Connected to Mongo DB");
 }).catch((e) => {
+    console.log(e);
     console.log("Failed to connect with DB");
 });
 
@@ -20,7 +24,6 @@ app.use("/", homepage);
 app.use("/api/notes", notes);
 
 const PORT = process.env.PORT || 3000;
-const hostName = "192.168.17.148";
-app.listen(PORT, hostName, () => {
-    console.log(`Server Listening ${hostName}:${PORT}`);
+app.listen(PORT, () => {
+    console.log(`Server Listening`);
 })
