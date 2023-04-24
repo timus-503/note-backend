@@ -16,10 +16,15 @@ mongoose.connect(process.env.MONGO_URL, { dbName: "notes" }).then((val) => {
 
 const homepage = require("./routes/homepage");
 const notes = require("./routes/notes");
-
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(helmet());
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET,PUT,PATCH,POST,DELETE");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 app.use("/", homepage);
 app.use("/api/notes", notes);
 
