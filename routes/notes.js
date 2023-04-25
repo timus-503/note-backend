@@ -50,6 +50,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", (req, res) => {
+    console.log(req.body);
     const { error } = validateNotes(req.body);
 
     if (error && error.details[0].message) {
@@ -69,6 +70,7 @@ router.post("/", (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
+    console.log(req.body);
     const _id = req.params.id;
     if (mongoose.Types.ObjectId.isValid(_id)) {
 
