@@ -13,7 +13,11 @@ const schema = mongoose.Schema({
 const Notes = mongoose.model("Note", schema);
 
 router.get("/", async (req, res) => {
-    const _notes = await Notes.find().select({ title: 1, description: 1, completed: 1, createdAt: 1 });
+    let param = {};
+    if (req.query.completed) {
+        param["completed"] = req.query.completed;
+    }
+    const _notes = await Notes.find(param).select({ title: 1, description: 1, completed: 1, createdAt: 1 });
     res.send({
         "success": true,
         "data": _notes,
