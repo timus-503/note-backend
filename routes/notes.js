@@ -6,13 +6,14 @@ const router = express.Router();
 const schema = mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
-    completed: { type: Boolean, required: false, default: false }
+    completed: { type: Boolean, required: false, default: false },
+    createdAt: { type: Date, default: Date.now },
 });
 
 const Notes = mongoose.model("Note", schema);
 
 router.get("/", async (req, res) => {
-    const _notes = await Notes.find().select({ title: 1, description: 1, completed: 1 });
+    const _notes = await Notes.find().select({ title: 1, description: 1, completed: 1, createdAt: 1 });
     res.send({
         "success": true,
         "data": _notes,
@@ -82,7 +83,7 @@ router.put("/:id", async (req, res) => {
                 "message": error.details[0].message,
             });
         } else {
-            const _notes = await Notes.findByIdAndUpdate(_id, { $set: req.body }, { new: 1 }).select({ title: 1, description: 1, completed: 1 });
+            const _notes = await Notes.findByIdAndUpdate(_id, { $set: req.body }, { new: 1 }).select({ title: 1, description: 1, completed: 1, createdAt: 1 });
             if (_notes != null) {
                 res.status(200).send({
                     "status": true,
@@ -107,7 +108,7 @@ router.put("/:id", async (req, res) => {
 router.get("/:id/completed", async (req, res) => {
     const _id = req.params.id;
     if (mongoose.Types.ObjectId.isValid(_id)) {
-        const _notes = await Notes.findByIdAndUpdate(_id, { completed: true }, { new: 1 }).select({ title: 1, description: 1, completed: 1 });
+        const _notes = await Notes.findByIdAndUpdate(_id, { completed: true }, { new: 1 }).select({ title: 1, description: 1, completed: 1, createdAt: 1 });
         if (_notes != null) {
             res.status(200).send({
                 "status": true,
