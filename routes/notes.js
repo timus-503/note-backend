@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
     if (req.query.completed) {
         param["completed"] = req.query.completed;
     }
-    const _notes = await Notes.find(param).select({ title: 1, description: 1, completed: 1, createdAt: 1 });
+    const _notes = await Notes.find(param).select({ title: 1, description: 1, completed: 1, createdAt: 1 }).sort({ createdAt: 1 });
     res.send({
         "success": true,
         "data": _notes,
