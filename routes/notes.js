@@ -74,6 +74,31 @@ router.post("/", (req, res) => {
     }
 });
 
+router.post("/bulk", (req, res) => {
+    console.log(req.body);
+    const { error } = validateBulkNotes(req.body);
+
+    if (error && error.details[0].message) {
+        res.status(400).send({
+            "status": false,
+            "message": error.details[0].message,
+        });
+    } else {
+        const newTodos = req.body.todo;
+        const updatedTodo = [];
+        for (var i = 0; i< newTodos.length;i++ ){
+            const _notes = Notes(newTodos[i]);
+            _notes.save();
+            updatedTodo.push(_notes)
+        }
+        res.status(200).send({
+            "status": true,
+            "message": "Note saved successfully",
+            "data": updatedTodo,
+        });
+    }
+});
+
 router.put("/:id", async (req, res) => {
     console.log(req.body);
     const _id = req.params.id;
@@ -162,6 +187,17 @@ function validateNotes(item) {
         title: Joi.string().required().min(3),
         description: Joi.string().required().max(255),
         completed: Joi.boolean(),
+    });
+    return validationSchema.validate(item);
+}
+
+function validateBulkNotes(item) {
+    const validationSchema = Joi.object({
+        todo: Joi.array().items(Joi.object({
+            title: Joi.string().required().min(3),
+            description: Joi.string().required().max(255),
+            completed: Joi.boolean(),
+        })).required()
     });
     return validationSchema.validate(item);
 }
