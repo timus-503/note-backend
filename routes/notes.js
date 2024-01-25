@@ -86,8 +86,44 @@ router.post("/bulk", (req, res) => {
     } else {
         const newTodos = req.body.todo;
         const updatedTodo = [];
-        for (var i = 0; i< newTodos.length;i++ ){
+        for (var i = 0; i < newTodos.length; i++) {
             const _notes = Notes(newTodos[i]);
+            _notes.save();
+            updatedTodo.push(_notes)
+        }
+        res.status(200).send({
+            "status": true,
+            "message": "Note saved successfully",
+            "data": updatedTodo,
+        });
+    }
+});
+
+router.post("/sync", async (req, res) => {
+    console.log(req.body);
+    const { error } = validateSyncNotes(req.body);
+
+    if (error && error.details[0].message) {
+        res.status(400).send({
+            "status": false,
+            "message": error.details[0].message,
+        });
+    } else {
+        const newTodos = req.body.todo;
+        const updatedTodo = [];
+        for (var i = 0; i < newTodos.length; i++) {
+            if (mongoose.Types.ObjectId.isValid(newTodos[i]._id)) { 
+                const exist = await Notes.findById(newTodos[i]._id);
+                if(exist){
+                    const _notes = await Notes.findByIdAndUpdate(newTodos[i]._id, { $set: newTodos[i] }, { new: 1 }).select({ title: 1, description: 1, completed: 1, createdAt: 1 });
+                    updatedTodo.push(_notes);
+                    continue;
+                }
+            }
+            const _notes = Notes({
+                title: newTodos[i].title,
+                description: newTodos[i].description
+            });
             _notes.save();
             updatedTodo.push(_notes)
         }
@@ -194,6 +230,18 @@ function validateNotes(item) {
 function validateBulkNotes(item) {
     const validationSchema = Joi.object({
         todo: Joi.array().items(Joi.object({
+            title: Joi.string().required().min(3),
+            description: Joi.string().required().max(255),
+            completed: Joi.boolean(),
+        })).required()
+    });
+    return validationSchema.validate(item);
+}
+
+function validateSyncNotes(item) {
+    const validationSchema = Joi.object({
+        todo: Joi.array().items(Joi.object({
+            _id: Joi.string().required(),
             title: Joi.string().required().min(3),
             description: Joi.string().required().max(255),
             completed: Joi.boolean(),
