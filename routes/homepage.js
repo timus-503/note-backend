@@ -17,7 +17,7 @@ router.post("/validate", (req, res) => {
         });
     } else {
         const plainText = req.body.text;
-        const convertedBase64Text = btoa(plainText)
+        const convertedBase64Text = Buffer.from(plainText).toString('base64')
         if (req.body.encoded_text === convertedBase64Text) {
             res.status(200).send({
                 "status": true,
