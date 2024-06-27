@@ -112,9 +112,9 @@ router.post("/sync", async (req, res) => {
         const newTodos = req.body.todo;
         const updatedTodo = [];
         for (var i = 0; i < newTodos.length; i++) {
-            if (mongoose.Types.ObjectId.isValid(newTodos[i]._id)) { 
+            if (mongoose.Types.ObjectId.isValid(newTodos[i]._id)) {
                 const exist = await Notes.findById(newTodos[i]._id);
-                if(exist){
+                if (exist) {
                     const _notes = await Notes.findByIdAndUpdate(newTodos[i]._id, { $set: newTodos[i] }, { new: 1 }).select({ title: 1, description: 1, completed: 1, createdAt: 1 });
                     updatedTodo.push(_notes);
                     continue;
